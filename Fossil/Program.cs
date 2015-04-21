@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Fossil
 {
@@ -16,8 +17,8 @@ namespace Fossil
                                 System.Console.WriteLine("Line:{0}, Type:{1}, Value:{2}", t.LineNumber, t.Type, t.Value);
                                 break;
                             }
-                        case TokenType.Number: {
-                                var t = (NumberToken)token;
+                        case TokenType.Integer: {
+                                var t = (IntegerToken)token;
                                 System.Console.WriteLine("Line:{0}, Type:{1}, Value:{2}", t.LineNumber, t.Type, t.Value);
                                 break;
                             }
@@ -33,6 +34,17 @@ namespace Fossil
                             }
                     }
                     token = lexer.Read();
+                }
+                
+
+            }
+            using (StreamReader reader = new StreamReader("testScript.txt")) {
+                Parser parser = new Parser(reader);
+
+                INode node = parser.read();
+                while (node != null) {
+                    System.Console.WriteLine((int)node.eval());
+                    node = parser.read();
                 }
             }
 

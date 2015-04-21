@@ -3,10 +3,20 @@
     internal enum TokenType
     {
         EOF,
-        Number,
+        Integer,
         String,
         Identifier,
         Operator,
+    }
+
+    internal enum OperatorType
+    {
+        LeftParenthesis,
+        RightParenthesis,
+        Addition,
+        Subtraction,
+        Multiplication,
+        Division,
     }
 
     internal abstract class Token
@@ -41,16 +51,16 @@
         }
     }
 
-    internal class NumberToken : Token
+    internal class IntegerToken : Token
     {
-        public NumberToken(int lineNumber, int value)
+        public IntegerToken(int lineNumber, int value)
             : base(lineNumber) {
             this.value = value;
         }
 
         public override TokenType Type {
             get {
-                return TokenType.Number;
+                return TokenType.Integer;
             }
         }
 
@@ -98,10 +108,11 @@
         }
     }
 
-    internal class OperatorToken : StringToken
+    internal class OperatorToken : Token
     {
-        public OperatorToken(int lineNumber, string value)
-            : base(lineNumber, value) {
+        public OperatorToken(int lineNumber, OperatorType value)
+            : base(lineNumber) {
+            this.value = value;
         }
 
         public override TokenType Type {
@@ -109,5 +120,13 @@
                 return TokenType.Operator;
             }
         }
+
+        public OperatorType Value {
+            get {
+                return value;
+            }
+        }
+
+        private OperatorType value;
     }
 }

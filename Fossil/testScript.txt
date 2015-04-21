@@ -1,5 +1,2 @@
-﻿// this is a comment
-234
-1 // comment
-value = number + 32;
-text = "String"; text = "Str" + "ing"
+﻿100 + 20 * 3 - 4
+(100 + 20) * (3 - 4)

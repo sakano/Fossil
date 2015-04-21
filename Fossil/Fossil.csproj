@@ -41,7 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractSyntaxTree\BinaryOperatorNode.cs" />
+    <Compile Include="AbstractSyntaxTree\Node.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
