@@ -12,24 +12,17 @@ namespace Fossil
         Operator,
     }
 
-    internal enum OperatorType
-    {
-        Semicolon,
-        LeftParenthesis,
-        RightParenthesis,
-        LeftBrace,
-        RightBrace,
-        Assignment,
-        Addition,
-        Subtraction,
-        Multiplication,
-        Division,
-    }
-
     internal abstract class Token
     {
         private readonly int lineNumber;
-        public int LineNumber { get { return lineNumber; } }
+        public int LineNumber
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<int>() >= 0);
+                return lineNumber;
+            }
+        }
 
         public abstract TokenType Type { get; }
 
@@ -75,12 +68,6 @@ namespace Fossil
 
     internal class StringToken : Token
     {
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(this.value != null);
-        }
-
         public StringToken(int lineNumber, string value)
             : base(lineNumber)
         {
@@ -92,20 +79,52 @@ namespace Fossil
         public override TokenType Type { get { return TokenType.String; } }
 
         private readonly string value;
-        public string Value { get { return value; } }
+        public string Value
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return value;
+            }
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(this.value != null);
+        }
     }
 
-    internal class IdentifierToken : StringToken
+    internal class IdentifierToken : Token
     {
         public IdentifierToken(int lineNumber, string value)
-            : base(lineNumber, value)
+            : base(lineNumber)
         {
             Contract.Requires<ArgumentOutOfRangeException>(lineNumber >= 0);
             Contract.Requires(value != null);
             Contract.Requires(value.Length != 0);
+            this.value = value;
         }
 
         public override TokenType Type { get { return TokenType.Identifier; } }
+
+        private readonly string value;
+        public string Value
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                Contract.Ensures(Contract.Result<string>().Length != 0);
+                return value;
+            }
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(this.value != null);
+            Contract.Invariant(this.value.Length != 0);
+        }
     }
 
     internal class OperatorToken : Token

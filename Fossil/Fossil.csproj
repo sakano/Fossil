@@ -157,11 +157,14 @@
     <Compile Include="AbstractSyntaxTree\BinaryOperatorNode.cs" />
     <Compile Include="AbstractSyntaxTree\BlockNode.cs" />
     <Compile Include="AbstractSyntaxTree\BooleanNode.cs" />
+    <Compile Include="AbstractSyntaxTree\CallFunctionNode.cs" />
+    <Compile Include="AbstractSyntaxTree\DefineFunctionNode.cs" />
+    <Compile Include="AbstractSyntaxTree\IdentifierNode.cs" />
     <Compile Include="AbstractSyntaxTree\IfStatementNode.cs" />
     <Compile Include="AbstractSyntaxTree\INode.cs" />
     <Compile Include="AbstractSyntaxTree\IntegerNode.cs" />
     <Compile Include="AbstractSyntaxTree\StringNode.cs" />
-    <Compile Include="AbstractSyntaxTree\VariableNode.cs" />
+    <Compile Include="FunctionObject.cs" />
     <Compile Include="RuntimeException.cs" />
     <Compile Include="Variant.cs" />
     <Compile Include="AbstractSyntaxTree\VoidNode.cs" />

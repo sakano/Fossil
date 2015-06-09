@@ -38,6 +38,18 @@ namespace Fossil
             return false;
         }
 
+        public bool AssignNew(string name, Variant variant)
+        {
+            Contract.Requires<ArgumentNullException>(name != null);
+            Contract.Requires<ArgumentException>(name.Length != 0);
+            Contract.Requires<ArgumentNullException>(variant != null);
+            if (variables.ContainsKey(name)) {
+                return false;
+            }
+            variables.Add(name, variant);
+            return true;
+        }
+
         public Variant Get(string name)
         {
             Contract.Requires<ArgumentNullException>(name != null);

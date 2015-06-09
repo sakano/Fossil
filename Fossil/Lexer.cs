@@ -8,6 +8,30 @@ using System.Text.RegularExpressions;
 
 namespace Fossil
 {
+    internal enum OperatorType
+    {
+        Equality,
+        Inequality,
+        LogicalAnd,
+        LogicalOr,
+        GreaterThanOrEqual,
+        LessThanOrEqual,
+        Semicolon,
+        Comma,
+        LeftParenthesis,
+        RightParenthesis,
+        LeftBrace,
+        RightBrace,
+        Assignment,
+        Addition,
+        Subtraction,
+        Multiplication,
+        Division,
+        Modulus,
+        GreaterThan,
+        LessThan,
+    }
+    
     internal class Lexer
     {
         public Lexer(TextReader reader)
@@ -58,12 +82,19 @@ namespace Fossil
             @"(?<comment>//.*)|" +
             @"(?<integer>[0-9]+)|" +
             @"(?<identifier>[_a-zA-Z][_a-zA-Z0-9]*)|" +
-            @"(?<operator>;|\(|\)|{|}|=|\+|-|\*|/)|" +
+            @"(?<operator>==|!=|&&|\|\||<=|>=|;|,|\(|\)|{|}|=|\+|-|\*|/|%|<|>)|" +
             "\"(?<string>.+?)\"",
             RegexOptions.Compiled);
 
         private readonly Dictionary<string, OperatorType> operatorTypes = new Dictionary<string, OperatorType> {
+            { "==", OperatorType.Equality },
+            { "!=", OperatorType.Inequality },
+            { "&&", OperatorType.LogicalAnd },
+            { "||", OperatorType.LogicalOr },
+            { "<=", OperatorType.GreaterThanOrEqual },
+            { ">=", OperatorType.LessThanOrEqual },
             { ";", OperatorType.Semicolon },
+            { ",", OperatorType.Comma },
             { "(", OperatorType.LeftParenthesis },
             { ")", OperatorType.RightParenthesis },
             { "{", OperatorType.LeftBrace },
@@ -73,6 +104,9 @@ namespace Fossil
             { "-", OperatorType.Subtraction },
             { "*", OperatorType.Multiplication },
             { "/", OperatorType.Division },
+            { "%", OperatorType.Modulus },
+            { "<", OperatorType.GreaterThan },
+            { ">", OperatorType.LessThan },
         };
 
         private Token getAt(int index)

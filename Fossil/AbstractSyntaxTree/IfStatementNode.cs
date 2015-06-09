@@ -15,7 +15,6 @@ namespace Fossil.AbstractSyntaxTree
 
         public Variant Eval(Environment env)
         {
-            Contract.Ensures(Contract.Result<Variant>() != null);
             if ((bool)conditionNode.Eval(env)) {
                 return thenNode.Eval(env);
             } else if (elseNode == null) {

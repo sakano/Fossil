@@ -13,7 +13,6 @@ namespace Fossil.AbstractSyntaxTree
 
         public Variant Eval(Environment env)
         {
-            Contract.Ensures(Contract.Result<Variant>() != null);
             return (Variant)token.Value;
         }
 

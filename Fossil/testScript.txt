@@ -26,3 +26,24 @@ outerValue = "outer";
     outerValue = "outer2";
 }
 "outerValue = " + outerValue;
+
+function fibonacci(n)
+{
+    if (n == 1) 0;
+    else if (n == 2) 1;
+    else fibonacci(n-2) + fibonacci(n-1);
+}
+fibonacci(1);
+fibonacci(2);
+fibonacci(3);
+fibonacci(4);
+fibonacci(5);
+fibonacci(6);
+fibonacci(7);
+fibonacci(8);
+fibonacci(9);
+fibonacci(10);
+fibonacci(11);
+fibonacci(12);
+fibonacci(13);
+fibonacci(14);
