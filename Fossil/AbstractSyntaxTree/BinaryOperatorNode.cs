@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Fossil.AbstractSyntaxTree
 {
-
-
     internal enum BinaryOperatorType
     {
         Addition = OperatorType.Addition,
@@ -16,28 +10,33 @@ namespace Fossil.AbstractSyntaxTree
         Multiplication = OperatorType.Multiplication,
         Division = OperatorType.Division,
     }
-    
+
     internal class BinaryOperatorNode : INode
     {
-        public BinaryOperatorNode(OperatorToken token, INode leftNode, INode rightNode) {
+        public BinaryOperatorNode(OperatorToken token, INode leftNode, INode rightNode)
+        {
+            Contract.Requires<ArgumentNullException>(token != null);
+            Contract.Requires<ArgumentNullException>(leftNode != null);
+            Contract.Requires<ArgumentNullException>(rightNode != null);
             this.token = token;
             this.leftNode = leftNode;
             this.rightNode = rightNode;
         }
 
-        public Object eval() {
+        public Variant eval()
+        {
+            Contract.Ensures(Contract.Result<Variant>() != null);
             switch (token.Value) {
                 case OperatorType.Addition:
-                    return (int)leftNode.eval() + (int)rightNode.eval();
+                    return leftNode.eval() + rightNode.eval();
                 case OperatorType.Subtraction:
-                    return (int)leftNode.eval() - (int)rightNode.eval();
+                    return leftNode.eval() - rightNode.eval();
                 case OperatorType.Multiplication:
-                    return (int)leftNode.eval() * (int)rightNode.eval();
+                    return leftNode.eval() * rightNode.eval();
                 case OperatorType.Division:
-                    return (int)leftNode.eval() / (int)rightNode.eval();
+                    return leftNode.eval() / rightNode.eval();
                 default:
-                    Debug.Assert(false);
-                    return 0;
+                    throw new NotImplementedException();
             }
         }
 
