@@ -52,7 +52,7 @@ namespace Fossil
         static void testParser(string filename)
         {
             Contract.Requires(!string.IsNullOrEmpty(filename));
-            Environment globalEnvironment = new Environment();
+            Environment globalEnvironment = new Environment(null);
             using (StreamReader reader = new StreamReader(filename)) {
                 Parser parser = new Parser(reader);
                 for (INode node = parser.Read(); node != null; node = parser.Read()) {

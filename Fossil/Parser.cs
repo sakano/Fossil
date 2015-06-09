@@ -65,7 +65,7 @@ namespace Fossil
         }
 
         /*
-         * statement   : ifStatement | simple
+         * statement   : ifStatement | block | simple
          * ifStatement : "if" "(" expression ")" ( block | simple ) [ "else" ( block | statement ) ]
          * simple      : ";" | expression ";"
          * block       : "{" { simple } "}"
@@ -78,7 +78,11 @@ namespace Fossil
         {
             Contract.Ensures(Contract.Result<INode>() != null);
             Token token = lexer.Peek(0);
-            if (token.Type == TokenType.Identifier) {
+            if (token.Type == TokenType.Operator) {
+                OperatorToken operatorToken = (OperatorToken)token;
+                if (operatorToken.Value != OperatorType.LeftBrace) { throw new SyntaxException(lexer.LineNumber); }
+                return block();
+            } else if (token.Type == TokenType.Identifier) {
                 var identifierToken = (IdentifierToken)token;
                 if (identifierToken.Value == "if") { return ifStatementNode(); }
             }
@@ -113,12 +117,7 @@ namespace Fossil
             token = lexer.Peek(0);
             if (token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "else") {
                 lexer.Read();
-                token = lexer.Peek(0);
-                if (token.Type == TokenType.Operator && ((OperatorToken)token).Value == OperatorType.LeftBrace) {
-                    elseNode = block();
-                } else {
-                    elseNode = statement();
-                }
+                elseNode = statement();
             }
 
             return new IfStatementNode(conditionNode, thenNode, elseNode);

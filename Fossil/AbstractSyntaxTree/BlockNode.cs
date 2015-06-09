@@ -15,10 +15,10 @@ namespace Fossil.AbstractSyntaxTree
         {
             Contract.Ensures(Contract.Result<Variant>() != null);
             Variant result = new Variant();
-
+            Environment newEnv = new Environment(env);
             foreach (var node in nodes) {
                 Contract.Assume(node != null);
-                result = node.Eval(env);
+                result = node.Eval(newEnv);
             }
             return result;
         }

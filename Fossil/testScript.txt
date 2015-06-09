@@ -17,3 +17,12 @@ if (false) {
 } else {
     4;
 }
+
+outerValue = "outer";
+
+{
+    innerValue = "inner";
+    "outerValue = " + outerValue + ", innerValue = " + innerValue;
+    outerValue = "outer2";
+}
+"outerValue = " + outerValue;
