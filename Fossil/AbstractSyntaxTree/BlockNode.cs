@@ -11,14 +11,14 @@ namespace Fossil.AbstractSyntaxTree
             this.nodes = nodes;
         }
 
-        public Variant eval()
+        public Variant Eval(Environment env)
         {
             Contract.Ensures(Contract.Result<Variant>() != null);
             Variant result = new Variant();
 
             foreach (var node in nodes) {
                 Contract.Assume(node != null);
-                result = node.eval();
+                result = node.Eval(env);
             }
             return result;
         }

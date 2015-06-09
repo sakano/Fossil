@@ -1,5 +1,13 @@
-﻿100 + 20 * 3 - 4;
-(100 + 20) * (3 - 4);
+﻿value = 100 + 20 * 3 - -4;
+value2 = (100 + 20) * (3 - 4);
+value4 = value3 = value + value2;
+"value3 = " + value3;
+"value4 = " + value4;
+
+value3 = 0;
+"value3 = " + value3;
+"value4 = " + value4;
+
 if (false) {
     1;
 } else if (false) {

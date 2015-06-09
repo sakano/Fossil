@@ -3,9 +3,9 @@ using System.Diagnostics.Contracts;
 
 namespace Fossil.AbstractSyntaxTree
 {
-    internal class IntegerNode : INode
+    internal class StringNode : INode
     {
-        public IntegerNode(IntegerToken token)
+        public StringNode(StringToken token)
         {
             Contract.Requires<ArgumentNullException>(token != null);
             this.token = token;
@@ -17,6 +17,6 @@ namespace Fossil.AbstractSyntaxTree
             return (Variant)token.Value;
         }
 
-        private readonly IntegerToken token;
+        private readonly StringToken token;
     }
 }

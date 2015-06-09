@@ -19,6 +19,7 @@ namespace Fossil
         RightParenthesis,
         LeftBrace,
         RightBrace,
+        Assignment,
         Addition,
         Subtraction,
         Multiplication,
@@ -42,6 +43,7 @@ namespace Fossil
         private void ObjectInvaliant()
         {
             Contract.Invariant(this.lineNumber >= 0);
+            Contract.Invariant(this.LineNumber >= 0);
         }
     }
 
@@ -100,6 +102,7 @@ namespace Fossil
         {
             Contract.Requires<ArgumentOutOfRangeException>(lineNumber >= 0);
             Contract.Requires(value != null);
+            Contract.Requires(value.Length != 0);
         }
 
         public override TokenType Type { get { return TokenType.Identifier; } }

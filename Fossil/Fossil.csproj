@@ -141,6 +141,9 @@
   <PropertyGroup>
     <StartupObject>Fossil.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -157,8 +160,12 @@
     <Compile Include="AbstractSyntaxTree\IfStatementNode.cs" />
     <Compile Include="AbstractSyntaxTree\INode.cs" />
     <Compile Include="AbstractSyntaxTree\IntegerNode.cs" />
-    <Compile Include="AbstractSyntaxTree\Variant.cs" />
+    <Compile Include="AbstractSyntaxTree\StringNode.cs" />
+    <Compile Include="AbstractSyntaxTree\VariableNode.cs" />
+    <Compile Include="RuntimeException.cs" />
+    <Compile Include="Variant.cs" />
     <Compile Include="AbstractSyntaxTree\VoidNode.cs" />
+    <Compile Include="Environment.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="SyntaxException.cs" />

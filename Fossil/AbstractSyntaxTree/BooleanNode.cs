@@ -9,7 +9,7 @@ namespace Fossil.AbstractSyntaxTree
             this.b = b;
         }
 
-        public Variant eval()
+        public Variant Eval(Environment env)
         {
             Contract.Ensures(Contract.Result<Variant>() != null);
             return (Variant)b;

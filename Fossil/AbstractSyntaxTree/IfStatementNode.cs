@@ -13,15 +13,15 @@ namespace Fossil.AbstractSyntaxTree
             this.elseNode = elseNode;
         }
 
-        public Variant eval()
+        public Variant Eval(Environment env)
         {
             Contract.Ensures(Contract.Result<Variant>() != null);
-            if ((bool)conditionNode.eval()) {
-                return thenNode.eval();
+            if ((bool)conditionNode.Eval(env)) {
+                return thenNode.Eval(env);
             } else if (elseNode == null) {
                 return new Variant();
             } else {
-                return elseNode.eval();
+                return elseNode.Eval(env);
             }
         }
 

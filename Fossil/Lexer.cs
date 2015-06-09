@@ -58,7 +58,7 @@ namespace Fossil
             @"(?<comment>//.*)|" +
             @"(?<integer>[0-9]+)|" +
             @"(?<identifier>[_a-zA-Z][_a-zA-Z0-9]*)|" +
-            @"(?<operator>;|\(|\)|{|}|\+|-|\*|/)|" +
+            @"(?<operator>;|\(|\)|{|}|=|\+|-|\*|/)|" +
             "\"(?<string>.+?)\"",
             RegexOptions.Compiled);
 
@@ -68,6 +68,7 @@ namespace Fossil
             { ")", OperatorType.RightParenthesis },
             { "{", OperatorType.LeftBrace },
             { "}", OperatorType.RightBrace },
+            { "=", OperatorType.Assignment },
             { "+", OperatorType.Addition },
             { "-", OperatorType.Subtraction },
             { "*", OperatorType.Multiplication },
@@ -110,10 +111,11 @@ namespace Fossil
                 if (match.Groups["integer"].Success) {
                     token = new IntegerToken(lineNumber, Convert.ToInt32(match.Groups["integer"].Value, 10));
                 } else if (match.Groups["identifier"].Success) {
+                    Contract.Assume(match.Groups["identifier"].Value.Length != 0);
                     token = new IdentifierToken(lineNumber, match.Groups["identifier"].Value);
                 } else if (match.Groups["operator"].Success) {
                     string key = match.Groups["operator"].Value;
-                    //Contract.Assert(operatorTypes.ContainsKey(key));
+                    Contract.Assume(operatorTypes.ContainsKey(key));
                     token = new OperatorToken(lineNumber, operatorTypes[key]);
                 } else if (match.Groups["string"].Success) {
                     token = new StringToken(lineNumber, match.Groups["string"].Value);

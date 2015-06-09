@@ -12,6 +12,7 @@ namespace Fossil
             string filename = "testScript.txt";
             testLexer(filename);
             testParser(filename);
+            Console.ReadLine();
         }
 
         static void testLexer(string filename)
@@ -51,10 +52,11 @@ namespace Fossil
         static void testParser(string filename)
         {
             Contract.Requires(!string.IsNullOrEmpty(filename));
+            Environment globalEnvironment = new Environment();
             using (StreamReader reader = new StreamReader(filename)) {
                 Parser parser = new Parser(reader);
                 for (INode node = parser.Read(); node != null; node = parser.Read()) {
-                    System.Console.WriteLine(node.eval());
+                    System.Console.WriteLine(node.Eval(globalEnvironment));
                 }
             }
         }
