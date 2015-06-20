@@ -43,7 +43,7 @@ namespace Fossil
             this.stringValue = value;
         }
 
-        public Variant(FunctionObject value)
+        public Variant(ICallableObject value)
         {
             Contract.Requires<ArgumentNullException>(value != null);
             this.type = VariantType.Function;
@@ -304,7 +304,7 @@ namespace Fossil
 
         private readonly int intValue;
         private readonly string stringValue = null;
-        private readonly FunctionObject funcValue = null;
+        private readonly ICallableObject funcValue = null;
         
         private readonly VariantType type;
         public VariantType Type { get { return this.type; } }

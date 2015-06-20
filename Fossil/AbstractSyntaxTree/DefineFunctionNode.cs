@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
@@ -13,6 +14,9 @@ namespace Fossil.AbstractSyntaxTree
             Contract.Requires<ArgumentNullException>(body != null);
             this.funcName = funcName;
             this.argNames = argNames;
+            if (argNames.Count() != argNames.Distinct().Count()) {
+                throw new SyntaxException(funcName.LineNumber);
+            }
             this.body = body;
         }
 

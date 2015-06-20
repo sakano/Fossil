@@ -1,51 +1,20 @@
-﻿var value = 100 + 20 * 3 - -4;
-var value2 = (100 + 20) * (3 - 4);
-var value3;
-var value4 = value3 = value + value2;
-"value3 = " + value3;
-"value4 = " + value4;
-
-value3 = 0;
-"value3 = " + value3;
-"value4 = " + value4;
-
-if (false) {
-    1;
-} else if (false) {
-    2;
-} else if (true) {
-    3;
-} else {
-    4;
-}
-
-var outerValue = "outer";
-
-{
-    var innerValue = "inner";
-    outerValue = "outer2";
-    var outerValue = "outer4";
-    outerValue = "outer5";
-}
-"outerValue = " + outerValue;
-
-function fibonacci(n)
+﻿function fibonacci(n)
 {
     if (n == 1) 0;
     else if (n == 2) 1;
     else fibonacci(n-2) + fibonacci(n-1);
 }
-fibonacci(1);
-fibonacci(2);
-fibonacci(3);
-fibonacci(4);
-fibonacci(5);
-fibonacci(6);
-fibonacci(7);
-fibonacci(8);
-fibonacci(9);
-fibonacci(10);
-fibonacci(11);
-fibonacci(12);
-fibonacci(13);
-fibonacci(14);
+output(fibonacci(1));
+output(fibonacci(2));
+output(fibonacci(3));
+output(fibonacci(4));
+output(fibonacci(5));
+output(fibonacci(6));
+output(fibonacci(7));
+output(fibonacci(8));
+output(fibonacci(9));
+output(fibonacci(10));
+output(fibonacci(11));
+output(fibonacci(12));
+output(fibonacci(13));
+output(fibonacci(14));

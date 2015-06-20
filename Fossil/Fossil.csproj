@@ -166,6 +166,8 @@
     <Compile Include="AbstractSyntaxTree\IntegerNode.cs" />
     <Compile Include="AbstractSyntaxTree\StringNode.cs" />
     <Compile Include="FunctionObject.cs" />
+    <Compile Include="ICallableObject.cs" />
+    <Compile Include="NativeFunctionObject.cs" />
     <Compile Include="RuntimeException.cs" />
     <Compile Include="Variant.cs" />
     <Compile Include="AbstractSyntaxTree\VoidNode.cs" />

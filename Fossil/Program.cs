@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Diagnostics.Contracts;
 using Fossil.AbstractSyntaxTree;
+using System.Collections.Generic;
 
 namespace Fossil
 {
@@ -10,12 +12,12 @@ namespace Fossil
         static void Main()
         {
             string filename = "testScript.txt";
-            testLexer(filename);
-            testParser(filename);
+            TestLexer(filename);
+            TestParser(filename);
             Console.ReadLine();
         }
 
-        static void testLexer(string filename)
+        static void TestLexer(string filename)
         {
             Contract.Requires(!string.IsNullOrEmpty(filename));
             using (StreamReader reader = new StreamReader(filename)) {
@@ -49,16 +51,25 @@ namespace Fossil
             }
         }
 
-        static void testParser(string filename)
+        static void TestParser(string filename)
         {
             Contract.Requires(!string.IsNullOrEmpty(filename));
             Environment globalEnvironment = new Environment(null);
+            globalEnvironment.AssignNew("output", new Variant(new NativeFunctionObject("output", Output)));
+            
             using (StreamReader reader = new StreamReader(filename)) {
                 Parser parser = new Parser(reader);
                 for (INode node = parser.Read(); node != null; node = parser.Read()) {
-                    System.Console.WriteLine(node.Eval(globalEnvironment));
+                    node.Eval(globalEnvironment);
                 }
             }
+        }
+
+        static Variant Output(List<Variant> args)
+        {
+            Contract.Requires<ArgumentNullException>(args != null);
+            System.Console.WriteLine(args.Select(arg => arg.ToString()).Aggregate((arg1, arg2) => arg1 + ", " + arg2));
+            return new Variant();
         }
     }
 }
