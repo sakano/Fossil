@@ -160,11 +160,13 @@
     <Compile Include="AbstractSyntaxTree\CallFunctionNode.cs" />
     <Compile Include="AbstractSyntaxTree\DefineFunctionNode.cs" />
     <Compile Include="AbstractSyntaxTree\DefineVariableNode.cs" />
+    <Compile Include="AbstractSyntaxTree\forStatementNode.cs" />
     <Compile Include="AbstractSyntaxTree\IdentifierNode.cs" />
     <Compile Include="AbstractSyntaxTree\IfStatementNode.cs" />
     <Compile Include="AbstractSyntaxTree\INode.cs" />
     <Compile Include="AbstractSyntaxTree\IntegerNode.cs" />
     <Compile Include="AbstractSyntaxTree\StringNode.cs" />
+    <Compile Include="AbstractSyntaxTree\whileStatementNode.cs" />
     <Compile Include="FunctionObject.cs" />
     <Compile Include="ICallableObject.cs" />
     <Compile Include="NativeFunctionObject.cs" />

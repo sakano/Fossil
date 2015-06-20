@@ -4,17 +4,7 @@
     else if (n == 2) 1;
     else fibonacci(n-2) + fibonacci(n-1);
 }
-output(fibonacci(1));
-output(fibonacci(2));
-output(fibonacci(3));
-output(fibonacci(4));
-output(fibonacci(5));
-output(fibonacci(6));
-output(fibonacci(7));
-output(fibonacci(8));
-output(fibonacci(9));
-output(fibonacci(10));
-output(fibonacci(11));
-output(fibonacci(12));
-output(fibonacci(13));
-output(fibonacci(14));
+
+for (var i = 1; i <= 20; i = i + 1) {
+    output("fib(" + i + ") = " + fibonacci(i));
+}

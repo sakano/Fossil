@@ -74,15 +74,18 @@ namespace Fossil
         }
 
         /*
-         * statement      : varStatement | ifStatement | funcStatement | block | simple
-         * varStatement   : "var" IDENTIFIER [ "=" expression  ] ";"
-         * ifStatement    : "if" "(" expression ")" ( block | simple ) [ "else" ( block | statement ) ]
+         * statement      : varStatement | ifStatement | forStatement | whileStatement | funcStatement | block | simple
+         * varStatement   : varExpression ";"
+         * varExpression  : "var" IDENTIFIER [ "=" expression  ]
+         * ifStatement    : "if" "(" expression ")" statement [ "else" statement ]
+         * forStatement   : "for" "(" [ varExpression | expression ] ";" [ expression ] ";" [expression] ")" statement
+         * whileStatement : "while" "(" expression ")" statement
          * funcStatement  : "function" IDENTIFIER "(" [ arguments ] ")" block
          * arguments      : IDENTIFIER { "," IDENTIFIER }
          * simple         : ";" | expression ";"
          * block          : "{" { statement } "}"
          * expression     : literal { binary_op literal }
-         * literal        : void | true | false | STRING | ["-"] NUMBER | factor
+         * literal        : void | true | false | STRING | ["+"|"-"] NUMBER | factor
          * factor         : ( IDENTIFIER  | "(" expression ")" ) [ funcCall ]
          * funcCall       : "(" [parameters] ")"
          * parameters     : expression { "," expression }
@@ -100,7 +103,9 @@ namespace Fossil
             } else if (token.Type == TokenType.Identifier) {
                 var identifierToken = (IdentifierToken)token;
                 if (identifierToken.Value == "var") { return varStatement(); }
-                if (identifierToken.Value == "if") { return ifStatementNode(); }
+                if (identifierToken.Value == "if") { return ifStatement(); }
+                if (identifierToken.Value == "for") { return forStatement(); }
+                if (identifierToken.Value == "while") { return whileStatement(); }
                 if (identifierToken.Value == "function") { return funcStatement(); }
             }
             return simple();
@@ -109,49 +114,44 @@ namespace Fossil
         private INode varStatement()
         {
             Contract.Ensures(Contract.Result<INode>() != null);
+            var node = varExpression();
+            readOperator(OperatorType.Semicolon);
+            return node;
+        }
+
+        private INode varExpression()
+        {
+            Contract.Ensures(Contract.Result<INode>() != null);
             Token token = lexer.Read();
             Contract.Assume(token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "var");
 
             Token varToken = lexer.Read();
             if (varToken.Type != TokenType.Identifier) { throw new SyntaxException(lexer.LineNumber); }
-        
+
             INode initializer;
-            if (checkNextOperator(OperatorType.Assignment)) {
+            if (isOperator(OperatorType.Assignment)) {
                 lexer.Read();
                 initializer = expression();
-            } else { 
+            } else {
                 initializer = new VoidNode();
             }
             
-            if (!checkNextOperator(OperatorType.Semicolon)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
-                
             return new DefineVariableNode((IdentifierToken)varToken, initializer);
-            
         }
-
-        private INode ifStatementNode()
+        
+        private INode ifStatement()
         {
             Contract.Ensures(Contract.Result<INode>() != null);
             Token token = lexer.Read();
             Contract.Assume(token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "if");
 
-            if (!checkNextOperator(OperatorType.LeftParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.LeftParenthesis);
 
             INode conditionNode = expression();
 
-            if (!checkNextOperator(OperatorType.RightParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.RightParenthesis);
 
-            INode thenNode = null;
-            token = lexer.Peek(0);
-            if (token.Type == TokenType.Operator && ((OperatorToken)token).Value == OperatorType.LeftBrace) {
-                thenNode = block();
-            } else {
-                thenNode = simple();
-            }
-            Contract.Assert(thenNode != null);
+            INode thenNode = statement();
 
             INode elseNode = null;
             token = lexer.Peek(0);
@@ -163,6 +163,54 @@ namespace Fossil
             return new IfStatementNode(conditionNode, thenNode, elseNode);
         }
 
+        private INode forStatement()
+        {
+            Contract.Ensures(Contract.Result<INode>() != null);
+            Token token = lexer.Read();
+            Contract.Assume(token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "for");
+            readOperator(OperatorType.LeftParenthesis);
+
+            INode initializerNode = null;
+            if (!isOperator(OperatorType.Semicolon)) {
+                Token nextToken = lexer.Peek(0);
+                if (nextToken.Type == TokenType.Identifier && ((IdentifierToken)nextToken).Value == "var") {
+                    initializerNode = varExpression();
+                } else {
+                    initializerNode = expression();
+                }
+            }
+            readOperator(OperatorType.Semicolon);
+
+            INode conditionNode = null;
+            if (!isOperator(OperatorType.Semicolon)) {
+                conditionNode = expression();
+            }
+            readOperator(OperatorType.Semicolon);
+
+            INode iteratorNode = null;
+            if (!isOperator(OperatorType.RightParenthesis)) {
+                iteratorNode = expression();
+            }
+            readOperator(OperatorType.RightParenthesis);
+
+            INode bodyNode = statement();
+            
+            return new forStatementNode(initializerNode, conditionNode, iteratorNode, bodyNode);
+        }
+        
+        private INode whileStatement()
+        {
+            Contract.Ensures(Contract.Result<INode>() != null);
+            Token token = lexer.Read();
+            Contract.Assume(token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "while");
+            readOperator(OperatorType.LeftParenthesis);
+            var conditionNode = expression();
+            readOperator(OperatorType.RightParenthesis);
+            var bodyNode = statement();
+            return new whileStatementNode(conditionNode, bodyNode);
+        }
+
+
         private INode funcStatement()
         {
             Contract.Ensures(Contract.Result<INode>() != null);
@@ -173,17 +221,15 @@ namespace Fossil
             if (token.Type != TokenType.Identifier) { throw new SyntaxException(lexer.LineNumber); }
             var nameToken = (IdentifierToken)token;
 
-            if (!checkNextOperator(OperatorType.LeftParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.LeftParenthesis);
 
             List<IdentifierNode> argTokens;
-            if (checkNextOperator(OperatorType.RightParenthesis)) {
+            if (isOperator(OperatorType.RightParenthesis)) {
                 lexer.Read();
                 argTokens = new List<IdentifierNode>();
             } else {
                 argTokens = arguments();
-                if (!checkNextOperator(OperatorType.RightParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-                lexer.Read();
+                readOperator(OperatorType.RightParenthesis);
             }
 
             var blockNode = block();
@@ -199,7 +245,7 @@ namespace Fossil
                 if (argToken.Type != TokenType.Identifier) { throw new SyntaxException(lexer.LineNumber); }
                 result.Add(new IdentifierNode((IdentifierToken)argToken));
                 
-                if (!checkNextOperator(OperatorType.Comma)) { break; }
+                if (!isOperator(OperatorType.Comma)) { break; }
                 lexer.Read();
             }
             return result;
@@ -208,15 +254,14 @@ namespace Fossil
         private INode simple()
         {
             Contract.Ensures(Contract.Result<INode>() != null);
-            if (checkNextOperator(OperatorType.Semicolon)) {
+            if (isOperator(OperatorType.Semicolon)) {
                 lexer.Read();
                 return new VoidNode();
             }
 
             INode node = expression();
 
-            if (!checkNextOperator(OperatorType.Semicolon)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.Semicolon);
 
             return node;
         }
@@ -224,11 +269,10 @@ namespace Fossil
         private BlockNode block()
         {
             Contract.Ensures(Contract.Result<INode>() != null);
-            if (!checkNextOperator(OperatorType.LeftBrace)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.LeftBrace);
 
             var nodes = new List<INode>();
-            while (!checkNextOperator(OperatorType.RightBrace)) {
+            while (!isOperator(OperatorType.RightBrace)) {
                 nodes.Add(statement());
             }
             lexer.Read();
@@ -283,6 +327,13 @@ namespace Fossil
                 return new IntegerNode((IntegerToken)token);
             } else if (token.Type == TokenType.Operator) {
                 var operatorToken = (OperatorToken)token;
+                if (operatorToken.Value == OperatorType.Addition) {
+                    lexer.Read();
+                    Token nextToken = lexer.Read();
+                    if (nextToken.Type != TokenType.Integer) { throw new SyntaxException(lexer.LineNumber); }
+                    var integerToken = (IntegerToken)nextToken;
+                    return new IntegerNode(new IntegerToken(integerToken.LineNumber, integerToken.Value));
+                }
                 if (operatorToken.Value == OperatorType.Subtraction) {
                     lexer.Read();
                     Token nextToken = lexer.Read();
@@ -303,17 +354,16 @@ namespace Fossil
             if (token.Type == TokenType.Identifier) {
                 node = new IdentifierNode((IdentifierToken)token);
 
-                if (!checkNextOperator(OperatorType.LeftParenthesis)) { return node; }
+                if (!isOperator(OperatorType.LeftParenthesis)) { return node; }
             } else if (token.Type == TokenType.Operator) {
                 var operatorToken = (OperatorToken)token;
                 if (operatorToken.Value != OperatorType.LeftParenthesis) { throw new SyntaxException(lexer.LineNumber); }
 
                 node = expression();
 
-                if (!checkNextOperator(OperatorType.RightParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-                lexer.Read();
+                readOperator(OperatorType.RightParenthesis);
 
-                if (!checkNextOperator(OperatorType.LeftParenthesis)) { return node; }
+                if (!isOperator(OperatorType.LeftParenthesis)) { return node; }
             } else {
                 throw new SyntaxException(lexer.LineNumber);
             }
@@ -324,32 +374,36 @@ namespace Fossil
         private List<INode> funcCall()
         {
             Contract.Ensures(Contract.Result<List<INode>>() != null);
-            Contract.Assume(checkNextOperator(OperatorType.LeftParenthesis));
-            lexer.Read();
+            readOperator(OperatorType.LeftParenthesis);
 
             List<INode> result = new List<INode>();
-            if (checkNextOperator(OperatorType.RightParenthesis)) {
+            if (isOperator(OperatorType.RightParenthesis)) {
                 lexer.Read();
                 return result;
             }
 
             result.Add(expression());
 
-            while (checkNextOperator(OperatorType.Comma)) {
+            while (isOperator(OperatorType.Comma)) {
                 lexer.Read();
                 result.Add(expression());
             }
 
-            if (!checkNextOperator(OperatorType.RightParenthesis)) { throw new SyntaxException(lexer.LineNumber); }
-            lexer.Read();
+            readOperator(OperatorType.RightParenthesis);
 
             return result;
         }
 
-        private bool checkNextOperator(OperatorType type)
+        private bool isOperator(OperatorType type)
         {
             Token token = lexer.Peek(0);
             return token.Type == TokenType.Operator && ((OperatorToken)token).Value == type;
+        }
+
+        private void readOperator(OperatorType type)
+        {
+            if (!isOperator(type)) { throw new SyntaxException(lexer.LineNumber); }
+            lexer.Read();
         }
     }
 }

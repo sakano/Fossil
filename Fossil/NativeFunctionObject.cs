@@ -23,8 +23,7 @@ namespace Fossil
         {
             List<Variant> evaledParameters = parameters.Select(node => node.Eval(env)).ToList();
             Variant result = nativeFunction.Invoke(evaledParameters);
-            if (result == null) { return new Variant(); }
-            return result;
+            return result ?? new Variant();
         }
 
         public string Name { get { return funcName; } }
