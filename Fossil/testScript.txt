@@ -1,6 +1,7 @@
-﻿value = 100 + 20 * 3 - -4;
-value2 = (100 + 20) * (3 - 4);
-value4 = value3 = value + value2;
+﻿var value = 100 + 20 * 3 - -4;
+var value2 = (100 + 20) * (3 - 4);
+var value3;
+var value4 = value3 = value + value2;
 "value3 = " + value3;
 "value4 = " + value4;
 
@@ -18,12 +19,13 @@ if (false) {
     4;
 }
 
-outerValue = "outer";
+var outerValue = "outer";
 
 {
-    innerValue = "inner";
-    "outerValue = " + outerValue + ", innerValue = " + innerValue;
+    var innerValue = "inner";
     outerValue = "outer2";
+    var outerValue = "outer4";
+    outerValue = "outer5";
 }
 "outerValue = " + outerValue;
 

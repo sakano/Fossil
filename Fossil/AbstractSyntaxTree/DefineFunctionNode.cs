@@ -6,7 +6,7 @@ namespace Fossil.AbstractSyntaxTree
 {
     internal class DefineFunctionNode : INode
     {
-        public DefineFunctionNode(IdentifierNode funcName, List<IdentifierNode> argNames, BlockNode body)
+        public DefineFunctionNode(IdentifierToken funcName, List<IdentifierNode> argNames, BlockNode body)
         {
             Contract.Requires<ArgumentNullException>(funcName != null);
             Contract.Requires<ArgumentNullException>(argNames != null);
@@ -19,11 +19,13 @@ namespace Fossil.AbstractSyntaxTree
         public Variant Eval(Environment env)
         {
             var variant = new Variant(new FunctionObject(funcName, argNames, body));
-            env.Assign(funcName.Name, variant);
+            if (!env.AssignNew(funcName.Value, variant)) {
+                throw new RuntimeException(funcName.LineNumber, "variable already defined");
+            }
             return variant;
         }
 
-        private readonly IdentifierNode funcName;
+        private readonly IdentifierToken funcName;
         private readonly List<IdentifierNode> argNames;
         private readonly BlockNode body;
     }

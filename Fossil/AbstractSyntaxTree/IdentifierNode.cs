@@ -19,16 +19,7 @@ namespace Fossil.AbstractSyntaxTree
             }
             return v;
         }
-
-        public Variant Assign(Environment env, Variant variant)
-        {
-            Contract.Requires<ArgumentNullException>(env != null);
-            Contract.Requires<ArgumentNullException>(variant != null);
-            Contract.Ensures(Contract.Result<Variant>() != null);
-            env.Assign(identifierToken.Value, variant);
-            return variant;
-        }
-
+        
         public string Name {
             get{
                 Contract.Ensures(Contract.Result<string>() != null);

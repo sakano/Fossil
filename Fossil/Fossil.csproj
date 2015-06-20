@@ -159,6 +159,7 @@
     <Compile Include="AbstractSyntaxTree\BooleanNode.cs" />
     <Compile Include="AbstractSyntaxTree\CallFunctionNode.cs" />
     <Compile Include="AbstractSyntaxTree\DefineFunctionNode.cs" />
+    <Compile Include="AbstractSyntaxTree\DefineVariableNode.cs" />
     <Compile Include="AbstractSyntaxTree\IdentifierNode.cs" />
     <Compile Include="AbstractSyntaxTree\IfStatementNode.cs" />
     <Compile Include="AbstractSyntaxTree\INode.cs" />

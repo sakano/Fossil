@@ -10,7 +10,7 @@ namespace Fossil
 {
     class FunctionObject
     {
-        public FunctionObject(IdentifierNode funcName, List<IdentifierNode> argNames, BlockNode body)
+        public FunctionObject(IdentifierToken funcName, List<IdentifierNode> argNames, BlockNode body)
         {
             Contract.Requires<ArgumentNullException>(funcName != null);
             Contract.Requires<ArgumentNullException>(argNames != null);
@@ -29,10 +29,14 @@ namespace Fossil
             for (var i = 0; i < argNames.Count; ++i) {
                 Contract.Assume(argNames[i] != null);
                 if (parameters.Count <= i) {
-                    newEnv.AssignNew(argNames[i].Name, new Variant());
+                    if (!newEnv.AssignNew(argNames[i].Name, new Variant())) {
+                        throw new RuntimeException(funcName.LineNumber, "variable already defined");
+                    }
                 } else {
                     Contract.Assume(parameters[i] != null);
-                    newEnv.AssignNew(argNames[i].Name, parameters[i].Eval(env));
+                    if (!newEnv.AssignNew(argNames[i].Name, parameters[i].Eval(env))) {
+                        throw new RuntimeException(funcName.LineNumber, "variable already defined");
+                    }
                 }
             }
             return body.EvalWithoutNewEnvironment(newEnv);
@@ -43,18 +47,18 @@ namespace Fossil
             get
             {
                 Contract.Ensures(Contract.Result<string>() != null);
-                return funcName.Name;
+                return funcName.Value;
             }
         }
 
-        private readonly IdentifierNode funcName;
+        private readonly IdentifierToken funcName;
         private readonly List<IdentifierNode> argNames;
         private readonly BlockNode body;
 
         public override string ToString()
         {
             Contract.Ensures(Contract.Result<string>() != null);
-            return string.Format("[function]{0}({1})", funcName.Name, string.Join(", ", argNames.Select((arg) => arg.Name)));
+            return string.Format("[function]{0}({1})", funcName.Value, string.Join(", ", argNames.Select((arg) => arg.Name)));
         }
 
         [ContractInvariantMethod]

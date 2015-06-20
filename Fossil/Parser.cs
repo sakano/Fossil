@@ -74,18 +74,19 @@ namespace Fossil
         }
 
         /*
-         * statement     : ifStatement | funcStatement | block | simple
-         * ifStatement   : "if" "(" expression ")" ( block | simple ) [ "else" ( block | statement ) ]
-         * funcStatement : "function" IDENTIFIER "(" [ arguments ] ")" block
-         * arguments     : IDENTIFIER { "," IDENTIFIER }
-         * simple        : ";" | expression ";"
-         * block         : "{" { statement } "}"
-         * expression    : literal { binary_op literal }
-         * literal       : void | true | false | STRING | ["-"] NUMBER | factor
-         * factor        : ( IDENTIFIER  | "(" expression ")" ) [ funcCall ]
-         * funcCall      : "(" [parameters] ")"
-         * parameters    : expression { "," expression }
-         * binary_op     : "=" | "+" | "-" | "*" | "/" | "=="
+         * statement      : varStatement | ifStatement | funcStatement | block | simple
+         * varStatement   : "var" IDENTIFIER [ "=" expression  ] ";"
+         * ifStatement    : "if" "(" expression ")" ( block | simple ) [ "else" ( block | statement ) ]
+         * funcStatement  : "function" IDENTIFIER "(" [ arguments ] ")" block
+         * arguments      : IDENTIFIER { "," IDENTIFIER }
+         * simple         : ";" | expression ";"
+         * block          : "{" { statement } "}"
+         * expression     : literal { binary_op literal }
+         * literal        : void | true | false | STRING | ["-"] NUMBER | factor
+         * factor         : ( IDENTIFIER  | "(" expression ")" ) [ funcCall ]
+         * funcCall       : "(" [parameters] ")"
+         * parameters     : expression { "," expression }
+         * binary_op      :  "==" | "!=" | "&&" | "||" | "<=" | ">=" | "=" | "+" | "-" | "*" | "/" | "%" | "<" | ">"
          */
 
         private INode statement()
@@ -98,10 +99,35 @@ namespace Fossil
                 return block();
             } else if (token.Type == TokenType.Identifier) {
                 var identifierToken = (IdentifierToken)token;
+                if (identifierToken.Value == "var") { return varStatement(); }
                 if (identifierToken.Value == "if") { return ifStatementNode(); }
                 if (identifierToken.Value == "function") { return funcStatement(); }
             }
             return simple();
+        }
+        
+        private INode varStatement()
+        {
+            Contract.Ensures(Contract.Result<INode>() != null);
+            Token token = lexer.Read();
+            Contract.Assume(token.Type == TokenType.Identifier && ((IdentifierToken)token).Value == "var");
+
+            Token varToken = lexer.Read();
+            if (varToken.Type != TokenType.Identifier) { throw new SyntaxException(lexer.LineNumber); }
+        
+            INode initializer;
+            if (checkNextOperator(OperatorType.Assignment)) {
+                lexer.Read();
+                initializer = expression();
+            } else { 
+                initializer = new VoidNode();
+            }
+            
+            if (!checkNextOperator(OperatorType.Semicolon)) { throw new SyntaxException(lexer.LineNumber); }
+            lexer.Read();
+                
+            return new DefineVariableNode((IdentifierToken)varToken, initializer);
+            
         }
 
         private INode ifStatementNode()
@@ -161,7 +187,7 @@ namespace Fossil
             }
 
             var blockNode = block();
-            return new DefineFunctionNode(new IdentifierNode(nameToken), argTokens, blockNode);
+            return new DefineFunctionNode(nameToken, argTokens, blockNode);
         }
 
         private List<IdentifierNode> arguments()

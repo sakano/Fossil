@@ -30,7 +30,10 @@ namespace Fossil.AbstractSyntaxTree
                 case OperatorType.Assignment:
                     IdentifierNode variableNode = leftNode as IdentifierNode;
                     if (variableNode == null) { throw new RuntimeException(token.LineNumber, "invalid lvalue"); }
-                    return variableNode.Assign(env, rightNode.Eval(env));
+                    if (!env.AssignIfExist(variableNode.Name, rightNode.Eval(env))) {
+                        throw new RuntimeException(token.LineNumber, "undefined variable");
+                    }
+                    return variableNode.Eval(env);
                 case OperatorType.Addition:
                     return leftNode.Eval(env) + rightNode.Eval(env);
                 case OperatorType.Subtraction: {
